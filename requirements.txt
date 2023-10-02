@@ -1,5 +1,4 @@
 flask==2.2.2
 pandas==2.1.1
 geopy==2.4.0
-python==3.10.13
 Werkzeug==2.0.1
