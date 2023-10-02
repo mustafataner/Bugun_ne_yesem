@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bugün Ne Yesem?</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+<h1>Bugün Ne Yesem?</h1>
+<button onclick="getSuggestion()">Bugün Ne Yesem?</button>
+
+<div id="result"></div>
+
+<script>
+function getLocation() {
+    return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition((position) => {
+            resolve([position.coords.latitude, position.coords.longitude]);
+        }, reject);
+    });
+}
+
+async function getSuggestion() {
+    const location = await getLocation();
+    const max_distance_km = 5; // Bu kısmı bir slider veya başka bir yöntemle ayarlayabilirsiniz.
+    const response = await fetch('/get_suggestion', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            user_location: location,
+            max_distance_km: max_distance_km
+        })
+    });
+    const data = await response.json();
+
+    if (data.success) {
+        document.getElementById("result").innerHTML = `Bugün <b>${data.name}</b> adlı restoranda yemek yiyebilirsiniz! <a href="https://www.google.com/maps/dir/?api=1&destination=${data.latitude},${data.longitude}">Yol Tarifi Al</a>`;
+    } else {
+        document.getElementById("result").innerHTML = "Seçilen mesafede uygun bir restoran bulunamadı.";
+    }
+}
+</script>
+
+</body>
+</html>
